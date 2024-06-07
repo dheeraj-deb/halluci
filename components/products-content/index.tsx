@@ -1,9 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import List from './list';
+import { useQuery } from '@apollo/client';
+import { Product } from 'types';
 
-const ProductsContent = () => {
+
+
+
+
+const ProductsContent = ({products}:{products:Product[]}) => {
   const [orderProductsOpen, setOrderProductsOpen] = useState(false);
   
+
+  useEffect(()=>{
+    console.log(products,'p-content');
+    
+  },[products])
   return (
     <section className="products-content">
       <div className="products-content__intro">
@@ -29,7 +40,7 @@ const ProductsContent = () => {
         </form>
       </div>
 
-      <List />
+      <List products={products} /> 
     </section>
   );
 };

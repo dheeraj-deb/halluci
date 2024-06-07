@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import Router from "next/router";
-import { wrapper } from "../store";
+
 
 // types
 import type { AppProps } from "next/app";
@@ -14,7 +14,7 @@ import "../assets/css/main.css";
 
 import * as gtag from "./../utils/gtag";
 import { ApolloProvider } from "@apollo/client";
-import { client } from "../apolloclient";
+import { client } from "../libs/apolloClient";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -32,4 +32,4 @@ const MyApp = ({ Component, pageProps }: AppProps) => (
   </ApolloProvider>
 );
 
-export default wrapper.withRedux(MyApp);
+export default MyApp;
