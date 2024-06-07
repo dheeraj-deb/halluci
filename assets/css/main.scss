@@ -2820,3 +2820,60 @@ h1,h2,h3,h4,h5 {
     }
   }
 }
+
+/* src/components/Drawer.scss */
+
+$overlay-bg: rgba(0, 0, 0, 0.5);
+$drawer-bg: white;
+$box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+$transition-duration: 0.3s;
+$close-button-font-size: 1rem;
+$content-padding: 10px;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: $overlay-bg;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity $transition-duration ease;
+
+  &.overlay-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.drawer {
+  z-index: 999;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 80%;
+  background: $drawer-bg;
+  box-shadow: $box-shadow;
+  transform: translateY(100%);
+  transition: transform $transition-duration ease;
+
+  &.drawer-open {
+    transform: translateY(0);
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: $close-button-font-size;
+  cursor: pointer;
+}
+
+.content {
+  padding: $content-padding;
+}

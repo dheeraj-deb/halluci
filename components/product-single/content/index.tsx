@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import productsColors from './../../../utils/data/products-colors';
+import AddToCartModal from "../../addToCart/index";
 import productsSizes from './../../../utils/data/products-sizes';
 import CheckboxColor from './../../products-filter/form-builder/checkbox-color';
 import { useDispatch, useSelector } from 'react-redux';
@@ -114,6 +115,7 @@ const Content = ({ product }: ProductContent) => {
           </div>
         </div>
       </div>
+      <AddToCartModal/>
     </section>
   );
 };

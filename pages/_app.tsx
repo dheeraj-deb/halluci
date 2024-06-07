@@ -10,6 +10,7 @@ import "swiper/swiper.scss";
 import "rc-slider/assets/index.css";
 import "react-rater/lib/react-rater.css";
 import "../assets/css/styles.scss";
+import "../assets/css/main.css";
 
 import * as gtag from "./../utils/gtag";
 import { ApolloProvider } from "@apollo/client";
