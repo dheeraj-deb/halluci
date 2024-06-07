@@ -16,12 +16,12 @@ const Punctuation = ({ votes, punctuation, countOpinions }: PunctuationType) => 
       
       <div className="product-punctuation__rates">
         <ul className="punctuations-lists">
-          {votes.map((vote) => (
-            <li key={vote.count} className="punctuation-item">
+          {votes?.map((vote) => (
+            <li key={vote?.count} className="punctuation-item">
               <Rater total={1} interactive={false} rating={1} />
-              <span>{vote.value}</span>
+              <span>{vote?.value}</span>
               <div className="punctuation-item__bar">
-                <div style={{ width: percentageBar(vote.count)+'%' }} className="punctuation-item__bar__current"></div>
+                <div style={{ width: percentageBar(vote?.count)+'%' }} className="punctuation-item__bar__current"></div>
               </div>
             </li>
           ))}

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Footer from '../../components/footer';
 import Layout from '../../layouts/Main';
 import Breadcrumb from '../../components/breadcrumb';
@@ -13,25 +13,25 @@ import { server } from '../../utils/server';
 
 // types
 import { ProductType } from 'types';
+import { GET_PRODUCT } from 'graphql/query/products';
+import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 
 type ProductPageType = {
   product: ProductType;
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const pid = query.pid;
-  const res = await fetch(`${server}/api/product/${pid}`);
-  const product = await res.json();
 
-  return {
-    props: {
-      product,
-    },
-  }
-}
 
-const Product = ({ product }: ProductPageType) => {
+const Product = () => {
+  
+  const router = useRouter()
+  const { error, data} = useQuery(GET_PRODUCT,{variables:{id:router.query.pid}});
   const [showBlock, setShowBlock] = useState('description');
+  useEffect(()=>{
+    console.log(data,"single");
+    
+  },[data])
 
   return (
     <Layout>
@@ -40,8 +40,8 @@ const Product = ({ product }: ProductPageType) => {
       <section className="product-single">
         <div className="container">
           <div className="product-single__content">
-            <Gallery images={product.images} />
-            <Content product={product} />
+            <Gallery images={[data?.getProduct?.image]} />
+            <Content product={data?.getProduct} />
           </div>
 
           <div className="product-single__info">
@@ -51,7 +51,7 @@ const Product = ({ product }: ProductPageType) => {
             </div>
 
             <Description show={showBlock === 'description'} />
-            <Reviews product={product} show={showBlock === 'reviews'} />
+            <Reviews product={data?.getProduct} show={showBlock === 'reviews'} />
           </div>
         </div>
       </section>

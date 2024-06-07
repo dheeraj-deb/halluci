@@ -12,7 +12,7 @@ type HeaderType = {
 
 const Header = ({ isErrorPage }: HeaderType) => {
   const router = useRouter();
-  const { cartItems } = useSelector((state: RootState)  => state.cart);
+  // const { cartItems } = useSelector((state: RootState)  => state.cart);
   const arrayPaths = ['/'];  
 
   const [onTop, setOnTop] = useState(( !arrayPaths.includes(router.pathname) || isErrorPage ) ? false : true);
@@ -80,9 +80,9 @@ const Header = ({ isErrorPage }: HeaderType) => {
           <Link href="/cart">
             <button className="btn-cart">
               <i className="icon-cart"></i>
-              {cartItems.length > 0 && 
+              {/* {cartItems.length > 0 && 
                 <span className="btn-cart__count">{cartItems.length}</span>
-              }
+              } */}
             </button>
           </Link>
           <Link href="/login">

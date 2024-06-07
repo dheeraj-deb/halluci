@@ -4,17 +4,17 @@ import productsSizes from './../../../utils/data/products-sizes';
 import CheckboxColor from './../../products-filter/form-builder/checkbox-color';
 import { useDispatch, useSelector } from 'react-redux';
 import { some } from 'lodash';
-import { addProduct } from 'store/reducers/cart';
+// import { addProduct } from 'store/reducers/cart';
 import { toggleFavProduct } from 'store/reducers/user';
 import { ProductType, ProductStoreType } from 'types';
-import { RootState } from 'store';
+// import { RootState } from 'store';
 
 type ProductContent = {
   product: ProductType;
 }
 
 const Content = ({ product }: ProductContent) => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const [count, setCount] = useState<number>(1);
   const [color, setColor] = useState<string>('');
   const [itemSize, setItemSize] = useState<string>('');
@@ -22,26 +22,26 @@ const Content = ({ product }: ProductContent) => {
   const onColorSet = (e: string) => setColor(e);
   const onSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => setItemSize(e.target.value);
 
-  const { favProducts } = useSelector((state: RootState) => state.user);
-  const isFavourite = some(favProducts, productId => productId === product.id);
+  // const { favProducts } = useSelector((state: RootState) => state.user);
+  // const isFavourite = some(favProducts, productId => productId === product.id);
 
   const toggleFav = () => {
-    dispatch(toggleFavProduct(
-      { 
-        id: product.id,
-      }
-    ))
+    // dispatch(toggleFavProduct(
+    //   { 
+    //     id: product.id,
+    //   }
+    // ))
   }
 
   const addToCart = () => {
     const productToSave: ProductStoreType = { 
-      id: product.id,
-      name: product.name,
-      thumb: product.images ? product.images[0] : '',
-      price: product.currentPrice,
-      count: count,
-      color: color,
-      size: itemSize
+      id: product?._id,
+      name: product?.name,
+      thumb: product?.images ? product.images[0] : '',
+      price: product?.price,
+      // count: count,
+      // color: color,
+      // size: itemSize
     }
 
     const productStore = {
@@ -49,20 +49,20 @@ const Content = ({ product }: ProductContent) => {
       product: productToSave
     }
 
-    dispatch(addProduct(productStore));
+    // dispatch(addProduct(productStore));
   }
 
   return (
     <section className="product-content">
       <div className="product-content__intro">
-        <h5 className="product__id">Product ID:<br></br>{product.id}</h5>
+        <h5 className="product__id">Product ID:<br></br>{product?._id}</h5>
         <span className="product-on-sale">Sale</span>
-        <h2 className="product__name">{product.name}</h2>
+        <h2 className="product__name">{product?.name}</h2>
 
         <div className="product__prices">
-          <h4>${ product.currentPrice }</h4>
-          {product.discount &&
-            <span>${ product.price }</span>
+          <h4>${ product?.price }</h4>
+          {product?.discount &&
+            <span>${ product?.price }</span>
           }
         </div>
       </div>
@@ -71,7 +71,7 @@ const Content = ({ product }: ProductContent) => {
         <div className="product-filter-item">
           <h5>Color:</h5>
           <div className="checkbox-color-wrapper">
-            {productsColors.map(type => (
+            {productsColors?.map(type => (
               <CheckboxColor 
                 key={type.id} 
                 type={'radio'} 
@@ -89,7 +89,7 @@ const Content = ({ product }: ProductContent) => {
             <div className="select-wrapper">
               <select onChange={onSelectChange}>
                 <option>Choose size</option>
-                {productsSizes.map(type => (
+                {productsSizes?.map(type => (
                   <option value={type.label}>{type.label}</option>
                 ))}
               </select>
@@ -110,7 +110,7 @@ const Content = ({ product }: ProductContent) => {
             </div>
             
             <button type="submit" onClick={() => addToCart()} className="btn btn--rounded btn--yellow">Add to cart</button>
-            <button type="button" onClick={toggleFav} className={`btn-heart ${isFavourite ? 'btn-heart--active' : ''}`}><i className="icon-heart"></i></button>
+            {/* <button type="button" onClick={toggleFav} className={`btn-heart ${isFavourite ? 'btn-heart--active' : ''}`}><i className="icon-heart"></i></button> */}
           </div>
         </div>
       </div>
