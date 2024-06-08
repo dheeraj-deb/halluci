@@ -7,7 +7,7 @@ query getProfile{
       id
       name
       shopname
-      phonenumber
+      phone
     }
     status
   }

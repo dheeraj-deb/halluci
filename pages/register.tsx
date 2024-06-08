@@ -1,79 +1,113 @@
 import { useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../layouts/Main";
 import Link from "next/link";
 import OTPInput from "react-otp-input";
 import { REGISTER_USER } from "../graphql/mutation/registerUser";
-import { SEND_OTP, VERIFY_OTP } from "graphql/mutation/auth";
+import { SEND_OTP, VERIFY_OTP_WHILE_REGISTERING } from "graphql/mutation/auth";
 
 const RegisterPage = () => {
   const [step, setStep] = useState(1);
   const [otp, setOtp] = useState("");
-  const [formData, setFormData] = useState({
-    phoneNumber: "",
+  const [error, setError] = useState({
+    otp: "",
+    phone: "",
     name: "",
     shop_name: "",
-    address: {
-      address: "",
-    },
-    password: "",
+    state: "",
+    postalCode: "",
+    city: "",
+    street: "",
   });
-
+  const [formData, setFormData] = useState({
+    phone: "",
+    name: "",
+    shop_name: "",
+    state: "",
+    postalCode: "",
+    city: "",
+    street: "",
+  });
+  useEffect(() => {
+    console.log(step, "hi", error);
+  }, [error]);
   const router = useRouter();
 
   const handleInputChange = (e) => {
-    if (e.target.name === "address") {
-      setFormData({
-        ...formData,
-        address: {
-          ...formData.address,
-          address: e.target.value,
-        },
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-      });
-    }
+    setError((previousErr) => ({ ...previousErr, [e.target.name]: "" }));
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const nextStep = () => {
-    setStep((prev) => (prev < 3 ? prev + 1 : prev));
-  };
+  const [register, {}] = useMutation(REGISTER_USER);
+  const [sendOtp, {}] = useMutation(SEND_OTP);
+  const [verifyOtpWhileRegistering, {}] = useMutation(
+    VERIFY_OTP_WHILE_REGISTERING
+  );
 
-  const [register, { error, loading, data }] = useMutation(REGISTER_USER);
-  const [sendOtp, { error, loading, data }] = useMutation(SEND_OTP);
-  const [verifyOtp, { error, loading, data }] = useMutation(VERIFY_OTP);
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
     try {
+      e.preventDefault();
       if (step == 1) {
+        if (!formData.phone || formData.phone.length !== 10) {
+          console.log("Hoii");
+
+          return setError((previousErr) => ({
+            ...previousErr,
+            phone: "Please provide a proper phone number",
+          }));
+        }
         return await sendOtp({
-          variables: { phone: formData.phoneNumber },
+          variables: { phone: formData.phone },
           onCompleted(data) {
-            setStep((prev) => (prev < 2 ? prev + 1 : prev));
+            setStep((prev) => (prev < 3 ? prev + 1 : prev));
           },
         });
       }
-      if(step == 2) {
-        return await verifyOtp({
-          variables: { phone:formData.phoneNumber, otp },
+      if (step == 2) {
+        if (!otp || otp.length !== 4)
+          return setError((previousErr) => ({
+            ...previousErr,
+            otp: "Please provide OTP",
+          }));
+
+        return await verifyOtpWhileRegistering({
+          variables: { phone: formData.phone, otp },
+          onError(error, clientOptions) {
+            console.log(clientOptions);
+
+            setError((prev) => ({
+              ...prev,
+              otp: error.networkError?.result?.errors[0].message,
+            }));
+          },
           onCompleted: (data) => {
-            setStep((prev) => (prev < 2 ? prev + 1 : prev));
-            console.log(data);
+            setStep((prev) => (prev < 3 ? prev + 1 : prev));
+            console.log(data, step, "plcace");
           },
         });
       }
 
+      for (let i in formData) {
+        if (!formData[i])
+          return setError((prev) => ({ ...prev, [i]: `${i} is required` }));
+      }
+      console.log("reg");
 
-      register({
+      await register({
         variables: {
           name: formData.name,
           shopname: formData.shop_name,
-          phonenumber: formData.phoneNumber,
-          address: formData.address,
+          phone: formData.phone,
+          address: {
+            state: formData.state,
+            city: formData.city,
+            postalCode: formData.postalCode,
+            street: formData.street,
+          },
         },
         onCompleted: (data) => {
           console.log("data", data);
@@ -82,7 +116,9 @@ const RegisterPage = () => {
           }
         },
       });
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -107,7 +143,7 @@ const RegisterPage = () => {
               ever since the 1500s
             </p>
 
-            <form className="form" >
+            <form className="form" onSubmit={handleSubmit}>
               {step === 1 && (
                 <>
                   <div className="form__input-row">
@@ -115,23 +151,15 @@ const RegisterPage = () => {
                       className="form__input"
                       placeholder="phone number"
                       type="text"
-                      value={formData.phoneNumber}
-                      name="phoneNumber"
+                      value={formData.phone}
+                      name="phone"
                       onChange={handleInputChange}
                       // ref={}
                     />
 
-                    {/* {errors.email && errors.email.type === "required" && (
-                      <p className="message message--error">
-                        This field is required
-                      </p>
+                    {error.phone && (
+                      <p className="message message--error">{error.phone}</p>
                     )}
-
-                    {errors.email && errors.email.type === "pattern" && (
-                      <p className="message message--error">
-                        Please write a valid email
-                      </p>
-                    )} */}
                   </div>
                   <button
                     // onClick={nextStep}
@@ -153,7 +181,10 @@ const RegisterPage = () => {
                   <div className="form__input-row justify-content-center">
                     <OTPInput
                       value={otp}
-                      onChange={setOtp}
+                      onChange={(value) => {
+                        setOtp(value);
+                        setError((_) => ({ ..._, otp: "" }));
+                      }}
                       numInputs={4}
                       // renderSeparator={<span>-</span>}
                       containerStyle={{
@@ -168,16 +199,9 @@ const RegisterPage = () => {
                       }}
                       renderInput={(props) => <input {...props} />}
                     />
-                    {/* {errors.email && errors.email.type === "required" && (
-                      <p className="message message--error">
-                        This field is required
-                      </p>
+                    {error.otp && (
+                      <p className="message message--error">{error.otp}</p>
                     )}
-                    {errors.email && errors.email.type === "pattern" && (
-                      <p className="message message--error">
-                        Please write a valid email
-                      </p>
-                    )} */}
                   </div>
                   <button
                     type="submit"
@@ -199,6 +223,9 @@ const RegisterPage = () => {
                       value={formData.name}
                       onChange={handleInputChange}
                     />
+                    {error.name && (
+                      <p className="message message--error">{error.name}</p>
+                    )}
                   </div>
 
                   <div className="form__input-row">
@@ -210,29 +237,71 @@ const RegisterPage = () => {
                       value={formData.shop_name}
                       onChange={handleInputChange}
                     />
+                    {error.shop_name && (
+                      <p className="message message--error">
+                        {error.shop_name}
+                      </p>
+                    )}
                   </div>
 
                   <div className="form__input-row">
                     <input
                       className="form__input"
-                      placeholder="Address"
+                      placeholder="State"
                       type="text"
-                      name="address"
-                      value={formData.address.address}
+                      name="state"
+                      value={formData.state}
                       onChange={handleInputChange}
                     />
+
+                    {error.state && (
+                      <p className="message message--error">{error.state}</p>
+                    )}
+                  </div>
+                  <div className="form__input-row">
+                    <input
+                      className="form__input"
+                      placeholder="City"
+                      type="text"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                    />
+
+                    {error.city && (
+                      <p className="message message--error">{error.city}</p>
+                    )}
                   </div>
 
                   <div className="form__input-row">
                     <input
                       className="form__input"
-                      type="Password"
-                      placeholder="Password"
-                      name="password"
-                      value={formData.password}
+                      placeholder="Street"
+                      type="text"
+                      name="street"
+                      value={formData.street}
                       onChange={handleInputChange}
                     />
+
+                    {error.street && (
+                      <p className="message message--error">{error.street}</p>
+                    )}
                   </div>
+                  <div className="form__input-row">
+                    <input
+                      className="form__input"
+                      placeholder="Postal Code"
+                      type="text"
+                      name="postalCode"
+                      value={formData.postalCode}
+                      onChange={handleInputChange}
+                    />
+
+                    {error.postalCode && (
+                      <p className="message message--error">{error.postalCode}</p>
+                    )}
+                  </div>
+
 
                   <div className="form__info">
                     <div className="checkbox-wrapper">

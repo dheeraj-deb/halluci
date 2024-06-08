@@ -4,16 +4,14 @@ export const REGISTER_USER = gql`
   mutation registration(
     $name: String!
     $shopname: String!
-    $phonenumber: String!
+    $phone: String!
     $address: AddressInput!
-    $password: String!
   ) {
     registration(
       name: $name
       shopname: $shopname
-      phonenumber: $phonenumber
+      phone: $phone
       address: $address
-      password: $password
     ) {
       status
       message

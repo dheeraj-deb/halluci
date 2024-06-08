@@ -6,23 +6,29 @@ import { postData } from "../utils/services";
 import { useEffect, useState } from "react";
 import OtpInput from "react-otp-input";
 import { useMutation, useQuery } from "@apollo/client";
-import { SEND_OTP, VERIFY_OTP } from "../graphql/mutation/auth";
+import { SEND_OTP, VERIFY_OTP_WHILE_LOGIN } from "../graphql/mutation/auth";
 import { GET_PROFILE } from "../graphql/query/profile";
+import { useRouter } from "next/router";
 type LoginWithOtpType = {
   phone: string;
   otp?: string;
 };
 
 const LoginPage = () => {
+  const router = useRouter();
   const { register, handleSubmit, errors } = useForm();
   const [step, setStep] = useState(1);
+  const [error, setError] = useState({
+    otp: "",
+  });
   const [otp, setOtp] = useState("");
   const [phone, setPhone] = useState("");
   const [sendOtp, { error: errorWhileSending, loading }] =
     useMutation(SEND_OTP);
-  const [verifyOtp, { error: errorWhileVerification }] =
-    useMutation(VERIFY_OTP);
-
+  const [
+    verifyOtpWhileLogin,
+    { error: errorWhileVerification, loading: verificationLoading },
+  ] = useMutation(VERIFY_OTP_WHILE_LOGIN);
 
   useEffect(() => {
     console.log(errorWhileSending?.cause, errorWhileVerification);
@@ -41,11 +47,25 @@ const LoginPage = () => {
           },
         });
       console.log(phone);
-      
-      await verifyOtp({
+      if (!otp || otp.length !== 4)
+        return setError((pre) => ({ ...pre, otp: "Please provide OTP" }));
+      await verifyOtpWhileLogin({
         variables: { phone, otp },
         onCompleted: (data) => {
           console.log(data);
+          setError((prev) => ({
+            ...prev,
+            otp: "",
+          }));
+          router.push("/");
+        },
+        onError(error, clientOptions) {
+          console.log(clientOptions);
+
+          setError((prev) => ({
+            ...prev,
+            otp: error.networkError?.result?.errors[0].message,
+          }));
         },
       });
       setStep((prev) => (prev < 2 ? prev + 1 : prev));
@@ -136,22 +156,15 @@ const LoginPage = () => {
                       }}
                       renderInput={(props) => <input {...props} />}
                     />
-                    {errors.email && errors.email.type === "required" && (
-                      <p className="message message--error">
-                        This field is required
-                      </p>
-                    )}
-                    {errors.email && errors.email.type === "pattern" && (
-                      <p className="message message--error">
-                        Please write a valid email
-                      </p>
+                    {error.otp && (
+                      <p className="message message--error">{error.otp}</p>
                     )}
                   </div>
                   <button
                     type="submit"
                     className="btn btn--rounded btn--yellow btn-submit"
                   >
-                    Continue
+                    {verificationLoading ? "Verifying..." : "Continue"}
                   </button>
                 </>
               )}
@@ -192,8 +205,6 @@ const LoginPage = () => {
                   </p>
                 )}
               </div>*/}
-
-            
             </form>
           </div>
         </div>

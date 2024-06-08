@@ -19,7 +19,7 @@ export type ReviewType = {
 export type ProductType = {
   id: string;
   name: string;
-  description:string;
+  description: string;
   thumb: string;
   price: string;
   count: number;
@@ -75,4 +75,10 @@ type Variation = {
   color: string
   image: string
 
+}
+
+type FormFields = {
+  otp?: string
+  phone?: string
+  address?: Record<string, any>
 }

@@ -10,9 +10,18 @@ export const SEND_OTP = gql`
 `;
 
 
-export const VERIFY_OTP = gql`
-  mutation verifyOtp($phone: String!,$otp:String!) {
-    verifyOtp(phone: $phone,otp:$otp) {
+export const VERIFY_OTP_WHILE_REGISTERING = gql`
+  mutation verifyOtpWhileRegistering($phone: String!,$otp:String!) {
+    verifyOtpWhileRegistering(phone: $phone,otp:$otp) {
+      status
+    }
+    
+  }
+`;
+
+export const VERIFY_OTP_WHILE_LOGIN = gql`
+  mutation verifyOtpWhileLogin($phone: String!,$otp:String!) {
+    verifyOtpWhileLogin(phone: $phone,otp:$otp) {
       status
     }
     
