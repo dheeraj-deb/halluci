@@ -41,7 +41,7 @@ const LoginPage = () => {
           },
         });
       console.log(phone);
-
+      
       await verifyOtp({
         variables: { phone, otp },
         onCompleted: (data) => {

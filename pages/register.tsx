@@ -5,6 +5,7 @@ import Layout from "../layouts/Main";
 import Link from "next/link";
 import OTPInput from "react-otp-input";
 import { REGISTER_USER } from "../graphql/mutation/registerUser";
+import { SEND_OTP, VERIFY_OTP } from "graphql/mutation/auth";
 
 const RegisterPage = () => {
   const [step, setStep] = useState(1);
@@ -43,23 +44,45 @@ const RegisterPage = () => {
   };
 
   const [register, { error, loading, data }] = useMutation(REGISTER_USER);
+  const [sendOtp, { error, loading, data }] = useMutation(SEND_OTP);
+  const [verifyOtp, { error, loading, data }] = useMutation(VERIFY_OTP);
 
-  const handleSubmit = () => {
-    register({
-      variables: {
-        name: formData.name,
-        shopname: formData.shop_name,
-        phonenumber: formData.phoneNumber,
-        address: formData.address,
-        password: formData.password,
-      },
-      onCompleted: (data) => {
-        console.log("data", data);
-        if (data.registration.status === 200) {
-          router.push("/");
-        }
-      },
-    });
+  const handleSubmit = async () => {
+    try {
+      if (step == 1) {
+        return await sendOtp({
+          variables: { phone: formData.phoneNumber },
+          onCompleted(data) {
+            setStep((prev) => (prev < 2 ? prev + 1 : prev));
+          },
+        });
+      }
+      if(step == 2) {
+        return await verifyOtp({
+          variables: { phone:formData.phoneNumber, otp },
+          onCompleted: (data) => {
+            setStep((prev) => (prev < 2 ? prev + 1 : prev));
+            console.log(data);
+          },
+        });
+      }
+
+
+      register({
+        variables: {
+          name: formData.name,
+          shopname: formData.shop_name,
+          phonenumber: formData.phoneNumber,
+          address: formData.address,
+        },
+        onCompleted: (data) => {
+          console.log("data", data);
+          if (data.registration.status === 200) {
+            router.push("/");
+          }
+        },
+      });
+    } catch (err) {}
   };
 
   return (
@@ -84,7 +107,7 @@ const RegisterPage = () => {
               ever since the 1500s
             </p>
 
-            <form className="form">
+            <form className="form" >
               {step === 1 && (
                 <>
                   <div className="form__input-row">
@@ -111,8 +134,8 @@ const RegisterPage = () => {
                     )} */}
                   </div>
                   <button
-                    onClick={nextStep}
-                    type="button"
+                    // onClick={nextStep}
+                    type="submit"
                     className="btn btn--rounded btn--yellow btn-submit"
                   >
                     Sign up
@@ -158,7 +181,7 @@ const RegisterPage = () => {
                   </div>
                   <button
                     type="submit"
-                    onClick={nextStep}
+                    // onClick={nextStep}
                     className="btn btn--rounded btn--yellow btn-submit"
                   >
                     Continue
@@ -230,8 +253,8 @@ const RegisterPage = () => {
                       </label>
                     </div>
                     <button
-                      onClick={handleSubmit}
-                      type="button"
+                      // onClick={handleSubmit}
+                      type="submit"
                       className="btn btn--rounded btn--yellow btn-submit"
                     >
                       Continue
