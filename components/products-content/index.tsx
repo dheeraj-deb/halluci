@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import List from './list';
-import { useQuery } from '@apollo/client';
 import { Product } from 'types';
 
 
@@ -13,13 +12,13 @@ const ProductsContent = ({products}:{products:Product[]}) => {
 
   useEffect(()=>{
     console.log(products,'p-content');
-    
   },[products])
+
   return (
     <section className="products-content">
       <div className="products-content__intro">
-        <h2>Men's Tops <span>(133)</span></h2>
-        <button type="button" onClick={() => setOrderProductsOpen(!orderProductsOpen)} className="products-filter-btn"><i className="icon-filters"></i></button>
+        <h2>Top Products</h2>
+        {/* <button type="button" onClick={() => setOrderProductsOpen(!orderProductsOpen)} className="products-filter-btn"><i className="icon-filters"></i></button> */}
         <form className={`products-content__filter ${orderProductsOpen ? 'products-order-open' : ''}`}>
           <div className="products__filter__select">
             <h4>Show products: </h4>

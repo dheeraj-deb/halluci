@@ -193,23 +193,7 @@ const LoginPage = () => {
                 )}
               </div>*/}
 
-              <div className="form__info">
-                <div className="checkbox-wrapper">
-                  <label
-                    htmlFor="check-signed-in"
-                    className={`checkbox checkbox--sm`}
-                  >
-                    <input
-                      type="checkbox"
-                      name="keepSigned"
-                      id="check-signed-in"
-                      ref={register({ required: false })}
-                    />
-                    <span className="checkbox__check"></span>
-                    <p>Keep me signed in</p>
-                  </label>
-                </div>
-              </div>
+            
             </form>
           </div>
         </div>
