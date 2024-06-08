@@ -1,11 +1,16 @@
 import { gql } from "@apollo/client";
 
 export const GET_PROFILE = gql`
-  query getProfile {
-    getProfile {
-      name,
+query getProfile{
+  getProfile {
+    data {
+      id
+      name
+      shopname
       phonenumber
     }
-    
+    status
   }
+}
+
 `;

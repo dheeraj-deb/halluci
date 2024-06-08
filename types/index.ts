@@ -19,6 +19,7 @@ export type ReviewType = {
 export type ProductType = {
   id: string;
   name: string;
+  description:string;
   thumb: string;
   price: string;
   count: number;
@@ -41,15 +42,15 @@ export type ProductTypeList = {
   currentPrice?: number;
 }
 
-export type ProductStoreType = {
-  id: string;
-  name: string;
-  thumb: string;
-  price: number;
-  count: number;
-  color: string;
-  size: string;
-}
+// export type ProductStoreType = {
+//   id: string;
+//   name: string;
+//   thumb: string;
+//   price: number;
+//   count: number;
+//   color: string;
+//   size: string;
+// }
 
 export type GtagEventType = {
   action: string;

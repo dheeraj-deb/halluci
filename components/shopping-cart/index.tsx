@@ -1,9 +1,29 @@
 // import { useSelector } from 'react-redux';
-import CheckoutStatus from '../../components/checkout-status';
-import Item from './item';
-import { RootState } from 'store';
+import { useQuery } from "@apollo/client";
+import CheckoutStatus from "../../components/checkout-status";
+import { GET_CART } from "../../graphql/query/cart";
+import Item from "./item";
+import { RootState } from "store";
+import { useMemo } from "react";
+import { GET_PROFILE } from "graphql/query/profile";
 
 const ShoppingCart = () => {
+  const { data: profileData } = useQuery(GET_PROFILE);
+
+  const userProfile = useMemo(
+    () => profileData?.getProfile?.data,
+    [profileData]
+  );
+
+  const { data, error } = useQuery(GET_CART, {
+    variables: {
+      userId: "6657710804a44e8060c56819",
+    },
+    skip: !userProfile?.id,
+  });
+
+  const product = useMemo(() => data?.getCart, [data]);
+
   // const { cartItems } = useSelector((state: RootState)  => state.cart);
 
   // const priceTotal = () => {
@@ -15,6 +35,8 @@ const ShoppingCart = () => {
   //   return totalPrice;
   // }
 
+  console.log("product", product);
+
   return (
     <section className="cart">
       <div className="container">
@@ -24,11 +46,11 @@ const ShoppingCart = () => {
         </div>
 
         <div className="cart-list">
-          {/* {cartItems.length > 0 &&
+          {product?.products?.length > 0 && (
             <table>
               <tbody>
                 <tr>
-                  <th style={{textAlign: 'left'}}>Product</th>
+                  <th style={{ textAlign: "left" }}>Product</th>
                   <th>Color</th>
                   <th>Size</th>
                   <th>Ammount</th>
@@ -36,40 +58,37 @@ const ShoppingCart = () => {
                   <th></th>
                 </tr>
 
-                {cartItems.map(item => (
-                  <Item 
-                    key={item.id}
-                    id={item.id}
-                    thumb={item.thumb}
-                    name={item.name}
-                    color={item.color}
-                    price={item.price}
-                    size={item.size}
-                    count={item.count}
-                  />
+                {product?.products?.map((item, index) => (
+                  <Item key={index.toString()} item={item} />
                 ))}
               </tbody>
-            </table> 
-          } 
-          
-          {cartItems.length === 0 && 
-            <p>Nothing in the cart</p>
-          } */}
+            </table>
+          )}
+
+          {product?.products?.length === 0 && <p>Nothing in the cart</p>}
+          <>Subtotal: ₹{product?.grandTotal}</>
         </div>
-      
+
         <div className="cart-actions">
-          <a href="/products" className="cart__btn-back"><i className="icon-left"></i> Continue Shopping</a>
-          <input type="text" placeholder="Promo Code" className="cart__promo-code" />
+          <a href="/products" className="cart__btn-back">
+            <i className="icon-left"></i> Continue Shopping
+          </a>
+          <input
+            type="text"
+            placeholder="Promo Code"
+            className="cart__promo-code"
+          />
 
           <div className="cart-actions__items-wrapper">
             {/* <p className="cart-actions__total">Total cost <strong>${priceTotal().toFixed(2)}</strong></p> */}
-            <a href="/cart/checkout" className="btn btn--rounded btn--yellow">Checkout</a>
+            <a href="/cart/checkout" className="btn btn--rounded btn--yellow">
+              Checkout
+            </a>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 };
 
-  
-export default ShoppingCart
+export default ShoppingCart;

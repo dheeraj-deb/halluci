@@ -7,9 +7,9 @@ export const GET_PRODUCTS = gql`
         name
         description
         # category
-        # image
+        image
         variations{
-            # _id
+            _id
             color
             image
         }
@@ -27,9 +27,9 @@ export const GET_PRODUCT = gql`
         name
         description
         # category
-        # image
+        image
         variations{
-            # _id
+            _id
             color
             image
         }

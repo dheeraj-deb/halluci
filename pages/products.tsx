@@ -21,7 +21,7 @@ const Products = () => {
       <Breadcrumb />
       <section className="products-page">
         <div className="container">
-          <ProductsFilter />
+          {/* <ProductsFilter /> */}
           <ProductsContent products={data?.getProducts}/>
         </div>
       </section>
